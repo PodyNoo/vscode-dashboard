@@ -86,9 +86,19 @@ export function getDashboardContent(
         <div class="filter-wrapper">
             <span class="search-icon"/>${Icons.search}</span><input type="search" id="filter" aria-label="Filter Projects"><span id="clear" class="clear-search-icon"/>${Icons.remove}</span>
         </div>
+        ${infos.config.showTopButtons ? `
+        <div class="top-action-btn reload-dashboard">
+            <span data-action="reload-dashboard" title="Reload Dashboard">${Icons.reload}</span>
+        </div>
+        <div class="top-action-btn new-text-file">
+            <span data-action="new-text-file" title="New Text File">${Icons.file}</span>
+        </div>
+        <div class="top-action-btn open-folder">
+            <span data-action="open-folder" title="Open Folder">${Icons.folder}</span>
+        </div>
+        ` : '' }
         <div class="">
-            <div class="groups-wrapper ${!infos.config.displayProjectPath ? 'hide-project-path' : ''
-        }">
+            <div class="groups-wrapper ${!infos.config.displayProjectPath ? 'hide-project-path' : ''}">
         ${groups.length
             ? groups
                 .map((group) => getGroupSection(group, groups.length, infos))
@@ -139,6 +149,8 @@ function getGroupSection(
 
     var showAddProjectButton = infos.config.showAddProjectButtonTile;
 
+    const isRecentGroup = group.constructor.name === 'RecentGroup';
+
     return `
 <div class="group ${group.collapsed ? 'collapsed' : ''} ${group.projects.length === 0 ? 'no-projects' : ''
         }" data-group-id="${group.id}">
@@ -149,15 +161,17 @@ function getGroupSection(
             ${group.groupName || 'Unnamed Group'}
         </span>
         <div class="group-actions right">
-            <span data-action="add" title="Add Project">${Icons.add}</span>
-            <span data-action="edit" title="Edit Group">${Icons.edit}</span>
-            <span data-action="remove" title="Remove Group">${Icons.remove
-        }</span>
+            ${!isRecentGroup ? `<span data-action="add" title="Add Project">${Icons.add}</span>` : '' }
+            ${!isRecentGroup ? `<span data-action="edit" title="Edit Group">${Icons.edit}</span>` : '' }
+            ${!isRecentGroup ? 
+                `<span data-action="remove" title="Remove Group">${Icons.remove}</span>` : 
+                `<span data-action="empty-recent" title="Empty Group">${Icons.empty}</span>`
+            }
         </div>
     </div>
     <div class="group-list">
         <div class="drop-signal"></div>
-        ${group.projects.map((p) => getProjectDiv(p, infos)).join('\n')}
+        ${group.projects.map((p) => getProjectDiv(p, infos, isRecentGroup)).join('\n')}
         ${showAddProjectButton ? getAddProjectDiv(group.id) : ''}
     </div>       
 </div>`;
@@ -177,7 +191,7 @@ function getTempGroupSection(totalGroupCount: number) {
 </div>`;
 }
 
-function getProjectDiv(project: Project, infos: DashboardInfos) {
+function getProjectDiv(project: Project, infos: DashboardInfos, isRecentGroup = false) {
     var borderStyle = `background: ${project.color};`;
     var remoteType = getRemoteType(project);
     var trimmedPath = (project.path || '').replace(REMOTE_REGEX, '');
@@ -188,17 +202,18 @@ function getProjectDiv(project: Project, infos: DashboardInfos) {
 
     return `
 <div class="project-container">
-    <div class="project" data-id="${project.id}" data-name="${lowerName}"${isRemote ? 'data-is-remote' : ''
-        }>
+    <div class="project" data-id="${project.id}" data-name="${lowerName}" ${isRemote ? 'data-is-remote' : ''} ${isRecentGroup ? 'is-recent-project' : ''}>
         <div class="project-border" style="${borderStyle}"></div>
         <div class="project-actions-wrapper">
             <div class="project-actions">
-                <span data-action="color" title="Edit Color">${Icons.palette
-        }</span>
-                <span data-action="edit" title="Edit Project">${Icons.edit
-        }</span>
-                <span data-action="remove" title="Remove Project">${Icons.remove
-        }</span>
+                ${isRecentGroup ? `
+                    <span data-action="add-recent" title="Add Recent Project">${Icons.pin}</span>
+                    <span data-action="remove-recent" title="Remove Recent Project">${Icons.remove}</span>
+                ` : `
+                    <span data-action="color" title="Edit Color">${Icons.palette}</span>
+                    <span data-action="edit" title="Edit Project">${Icons.edit}</span>
+                    <span data-action="remove" title="Remove Project">${Icons.remove}</span>
+                `}
             </div>
         </div>
         <div class="fitty-container">
@@ -277,15 +292,21 @@ function getProjectContextMenu() {
     </div>
 
     <div class="custom-context-menu-separator"></div>
-    
-    <div class="custom-context-menu-item" data-action="color">
+    <div class="custom-context-menu-item not-recent" data-action="color">
         Edit Color
     </div>
-    <div class="custom-context-menu-item" data-action="edit">
+    <div class="custom-context-menu-item not-recent" data-action="edit">
         Edit Project
     </div>
-    <div class="custom-context-menu-item" data-action="remove">
+    <div class="custom-context-menu-item not-recent" data-action="remove">
         Remove Project
+    </div>
+    
+    <div class="custom-context-menu-item recent" data-action="add-recent">
+        Add Recent Project
+    </div>
+    <div class="custom-context-menu-item recent" data-action="remove-recent">
+        Remove Recent Project
     </div>
 </div>
 `;

@@ -135,6 +135,14 @@ function initProjects() {
             contextMenuElement.querySelectorAll(".not-remote").forEach(e => e.classList.add("disabled"));
         }
 
+        if (projectDiv.hasAttribute("is-recent-project")) {
+            contextMenuElement.querySelectorAll(".not-recent").forEach(e => e.classList.remove("visible"));
+            contextMenuElement.querySelectorAll(".recent").forEach(e => e.classList.add("visible"));
+        } else {
+            contextMenuElement.querySelectorAll(".not-recent").forEach(e => e.classList.add("visible"));
+            contextMenuElement.querySelectorAll(".recent").forEach(e => e.classList.remove("visible"));
+        }
+
         // place and show contextmenu
 
         contextMenuElement.style.left = e.pageX + "px";
@@ -235,6 +243,27 @@ function initProjects() {
         var groupDiv = e.target.closest('.group');
         if (groupDiv) {
             onInsideGroupClick(e, groupDiv);
+            return;
+        }
+
+        if (e.target.closest('[data-action="reload-dashboard"]')) {
+            window.vscode.postMessage({
+                type: 'reload-dashboard'
+            });
+            return;
+        }
+
+        if (e.target.closest('[data-action="new-text-file"]')) {
+            window.vscode.postMessage({
+                type: 'new-text-file'
+            });
+            return;
+        }
+
+        if (e.target.closest('[data-action="open-folder"]')) {
+            window.vscode.postMessage({
+                type: 'open-folder'
+            });
             return;
         }
     }

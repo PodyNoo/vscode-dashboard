@@ -2,18 +2,21 @@
 
 import * as vscode from 'vscode';
 
-import { Project, Group } from "../models";
+import { Project, Group, RecentGroup } from "../models";
 import { ADD_NEW_PROJECT_TO_FRONT, PROJECTS_KEY, StorageOption } from "../constants";
 import BaseService from './baseService';
 import ColorService from './colorService';
+import FolderService from './folderService';
 
 export default class ProjectService extends BaseService {
 
     colorService: ColorService;
+    folderService: FolderService;
 
-    constructor(context: vscode.ExtensionContext, colorService: ColorService) {
+    constructor(context: vscode.ExtensionContext, colorService: ColorService, folderService: FolderService) {
         super(context);
         this.colorService = colorService;
+        this.folderService = folderService;
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~ GET ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -30,6 +33,25 @@ export default class ProjectService extends BaseService {
     getGroup(groupId: string): Group {
         var groups = this.getGroups();
         return groups.find(g => g.id === groupId) || null;
+    }
+
+    getRecent(groups: Group[]): Group {
+        const recents = this.folderService.getRecentlyOpened();
+        const recentProjects: Project[] = []
+        const hidePinned: boolean = this.configurationSection.get('hideProjectAlreadyInGroupFromRecent');
+        recents.forEach(recent => {
+            if (hidePinned) {
+                for (let group of groups) {
+                    for (let project of group.projects) {
+                        if (project.path === recent.uri.path) {
+                            return;
+                        }
+                    }
+                }
+            }
+            recentProjects.push(new Project(recent.name, recent.uri.path));
+        });
+        return new RecentGroup("Recent", recentProjects);
     }
 
     getProjectsFlat(): Project[] {

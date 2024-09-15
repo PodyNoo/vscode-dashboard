@@ -134,6 +134,21 @@
                     "markdownDescription": "If set to ```false```, the dedicated '+' tile is hidden inside groups. Projects can be added by using the actions when hovering the group name. The dashboard needs to be refreshed for the changes to take effect.",
                     "default": true
                 },
+                "dashboard.showTopButtons": {
+                    "type": "boolean",
+                    "markdownDescription": "If set to ```false```, hides the top buttons (reload dashboard, open folder, new text file).",
+                    "default": true
+                },
+                "dashboard.showRecentGroup": {
+                    "type": "boolean",
+                    "markdownDescription": "If set to ```false```, the recent group, containing recently opened folders will be hidden.",
+                    "default": true
+                },
+                "dashboard.hideProjectAlreadyInGroupFromRecent": {
+                    "type": "boolean",
+                    "markdownDescription": "If set to ```false```, will show projects in recent group even if they are already in a group.",
+                    "default": true
+                },
                 "dashboard.customProjectCardBackground": {
                     "type": "string",
                     "default": null

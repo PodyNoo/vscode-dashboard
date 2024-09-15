@@ -10,6 +10,7 @@ import { lstatSync } from 'fs';
 import ColorService from './services/colorService';
 import ProjectService from './services/projectService';
 import FileService from './services/fileService';
+import FolderService from './services/folderService';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -42,8 +43,15 @@ export function activate(context: vscode.ExtensionContext) {
 
     var instance: vscode.WebviewPanel = null;
     const colorService = new ColorService(context);
-    const projectService = new ProjectService(context, colorService);
+    const folderService = new FolderService(context);
+    const projectService = new ProjectService(context, colorService, folderService);
     const fileService = new FileService(context);
+
+    vscode.workspace.onDidChangeWorkspaceFolders(async (event) => {
+        for (let folder of event.added) {
+            await folderService.addToRecentlyOpened({ uri: folder.uri, name: folder.name });
+        }
+    });
 
     const provider = new SidebarDummyDashboardViewProvider(context.extensionUri);
 
@@ -96,6 +104,15 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.workspace.onDidChangeConfiguration(event => {
         if (event.affectsConfiguration("dashboard.storeProjectsInSettings")) {
             checkDataMigration(true);
+        }
+        if (
+            event.affectsConfiguration("dashboard.showTopButtons") ||
+            event.affectsConfiguration("dashboard.showAddProjectButtonTile") ||
+            event.affectsConfiguration("dashboard.showAddGroupButtonTile") ||
+            event.affectsConfiguration("dashboard.showRecentGroup") ||
+            event.affectsConfiguration("dashboard.customCss")
+        ) {
+            showDashboard(false);
         }
     });
 
@@ -157,13 +174,21 @@ export function activate(context: vscode.ExtensionContext) {
         }
     }
 
-    function showDashboard() {
+    function showDashboard(reveal: boolean = true) {
         var columnToShowIn = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : null;
         var projects = projectService.getGroups();
+        var recentGroup: Group;
+
+        if (dashboardInfos.config.showRecentGroup) {
+            recentGroup = projectService.getRecent(projects);
+            projects.push(recentGroup)
+        }
 
         if (instance) {
             instance.webview.html = getDashboardContent(context, instance.webview, projects, dashboardInfos);
-            instance.reveal(columnToShowIn);
+            if (reveal) {
+                instance.reveal(columnToShowIn);
+            }
         } else {
             var panel = vscode.window.createWebviewPanel(
                 "dashboard",
@@ -186,7 +211,7 @@ export function activate(context: vscode.ExtensionContext) {
             }, null, context.subscriptions);
 
             panel.webview.onDidReceiveMessage(async (e) => {
-                let projectId: string, groupId: string;
+                let projectId: string, groupId: string, recentProject: Project;
                 switch (e.type) {
                     case 'selected-project':
                         projectId = e.projectId as string;
@@ -194,8 +219,15 @@ export function activate(context: vscode.ExtensionContext) {
 
                         let project = projectService.getProject(projectId);
                         if (project == null) {
-                            vscode.window.showWarningMessage("Selected Project not found.");
-                            break;
+                            if (dashboardInfos.config.showRecentGroup) { 
+                                 // maybe in recent projects
+                                project = recentGroup.projects.find(project => project.id === projectId);
+                            }
+
+                            if (project == null) {
+                                vscode.window.showWarningMessage("Selected Project not found.");
+                                break;
+                            }
                         }
 
                         await openProject(project, projectOpenType);
@@ -204,7 +236,12 @@ export function activate(context: vscode.ExtensionContext) {
                         groupId = e.groupId as string;
                         await addProject(groupId);
                         break;
-                    case 'import-from-other-storage':
+                    case 'add-recent-project':
+                        projectId = e.projectId as string;
+                        recentProject = recentGroup.projects.find(project => project.id === projectId);
+                        await addRecentProject(recentProject);
+                        break;
+                case 'import-from-other-storage':
                         await projectService.copyProjectsFromFilledStorageOptionToEmptyStorageOption();
                         await showDashboard();
                         break;
@@ -215,6 +252,11 @@ export function activate(context: vscode.ExtensionContext) {
                     case 'remove-project':
                         projectId = e.projectId as string;
                         await removeProject(projectId);
+                        break;
+                    case 'remove-recent-project':
+                        projectId = e.projectId as string;
+                        recentProject = recentGroup.projects.find(project => project.id === projectId);
+                        await removeRecentProject(recentProject);
                         break;
                     case 'edit-project':
                         projectId = e.projectId as string;
@@ -238,6 +280,18 @@ export function activate(context: vscode.ExtensionContext) {
                     case 'collapse-group':
                         groupId = e.groupId as string;
                         await collapseGroup(groupId);
+                        break;
+                    case 'empty-recent-group':
+                        await emptyRecentGroup();
+                        break;
+                    case 'open-folder':
+                        await folderService.openFolder();
+                        break;
+                    case 'new-text-file':
+                        await folderService.newTextFile();
+                        break;
+                    case 'reload-dashboard':
+                        showDashboard();
                         break;
                 }
             });
@@ -379,6 +433,17 @@ export function activate(context: vscode.ExtensionContext) {
         //showDashboard(); // No need to repaint for that
     }
 
+    async function emptyRecentGroup() {
+        await folderService.updateRecentlyOpened([]);
+
+        let accepted = await vscode.window.showWarningMessage(`Empty all recents folders ?`, { modal: true }, 'Empty');
+        if (!accepted) {
+            return;
+        }
+
+        showDashboard();
+    }
+
     async function openProject(project: Project, projectOpenType: ProjectOpenType): Promise<void> {
         // project is parsed from JSON at runtime, so its not an instance of Project
         let remoteType = getRemoteType(project);
@@ -502,6 +567,23 @@ export function activate(context: vscode.ExtensionContext) {
         showDashboard();
     }
 
+    async function addRecentProject(recentProject: Project) {
+        try {
+            var project: Project, selectedGroupId: string;
+            [project, selectedGroupId] = await queryProjectFields(null, false, { path: recentProject.path, name: recentProject.name }, true);
+            await projectService.addProject(project, selectedGroupId);
+        } catch (error) {
+            if (error.message !== USER_CANCELED) {
+                vscode.window.showErrorMessage(`An error occured while adding the project.`);
+                throw error; // Rethrow error to make vscode log it
+            }
+
+            return;
+        }
+
+        showDashboard();
+    }
+
     async function editProject(projectId: string) {
         var [project, group] = projectService.getProjectAndGroup(projectId);
         if (project == null || group == null) {
@@ -545,7 +627,7 @@ export function activate(context: vscode.ExtensionContext) {
         showDashboard();
     }
 
-    async function queryProjectFields(groupId: string = null, isEditing: boolean, projectTemplate: { name?: string, path?: string, color?: string } = null): Promise<[Project, string]> {
+    async function queryProjectFields(groupId: string = null, isEditing: boolean, projectTemplate: { name?: string, path?: string, color?: string } = null, isRecentProject: boolean = false): Promise<[Project, string]> {
         // For editing a project: Ignore Group selection and take it from template
         var selectedGroupId: string, projectPath: string, defaultProjectName: string;
         var groupWasNewlyCreated = false;
@@ -563,7 +645,9 @@ export function activate(context: vscode.ExtensionContext) {
                 if (selectedGroupId == null) {
                     [selectedGroupId, groupWasNewlyCreated] = await queryGroup(groupId, true);
                 }
-                projectPath = await queryProjectPath(projectPath);
+                if((projectPath == null && isRecentProject) || !isRecentProject) {
+                    projectPath = await queryProjectPath(projectPath);
+                }
             }
 
             defaultProjectName = defaultProjectName || getLastPartOfPath(projectPath).replace(/\.code-workspace$/g, '');
@@ -1033,6 +1117,17 @@ export function activate(context: vscode.ExtensionContext) {
         }
 
         await projectService.removeProject(projectId);
+        showDashboard();
+    }
+
+    async function removeRecentProject(recentProject: Project) {
+        let accepted = await vscode.window.showWarningMessage(`Remove ${recentProject.name}?`, { modal: true }, 'Remove');
+        if (!accepted) {
+            return;
+        }
+
+        await folderService.removeProjectFromRecentlyOpened(recentProject);
+
         showDashboard();
     }
 

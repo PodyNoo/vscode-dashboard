@@ -365,6 +365,18 @@ body .project {
             pointer-events: none;
             opacity: 50%;
         }
+
+        &.recent {
+            display: none;
+        }
+
+        &.not-recent {
+            display: none;
+        }
+
+        &.visible {
+            display: block !important;
+        }
     }
 
     .custom-context-menu-separator {
@@ -519,4 +531,33 @@ body {
             display: none !important;
         }
     }
+}
+
+
+.top-action-btn {
+    top: 20px;
+    display: flex;
+    align-items: center;
+    position: absolute;
+    height: 30.5px;
+    cursor: pointer;
+    z-index: 10;
+    right: 0;
+
+    svg {
+        height: 40px;
+    }
+}
+
+.reload-dashboard {
+    margin-right: 105px;
+}
+
+.new-text-file {
+    margin-right: 65px;
+}
+
+.open-folder {
+    right: 0;
+    margin-right: 25px;
 }
