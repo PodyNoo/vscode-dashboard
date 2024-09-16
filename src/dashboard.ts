@@ -288,7 +288,7 @@ export function activate(context: vscode.ExtensionContext) {
                         await folderService.openFolder();
                         break;
                     case 'new-text-file':
-                        await folderService.newTextFile();
+                        await fileService.newTextFile();
                         break;
                     case 'reload-dashboard':
                         showDashboard();

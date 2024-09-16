@@ -1,6 +1,8 @@
 import BaseService from "./baseService";
 import * as fs from 'fs';
 import * as path from 'path';
+import * as vscode from 'vscode'
+
 import { ProjectPathType } from "../models";
 
 export default class FileService extends BaseService {
@@ -60,5 +62,13 @@ export default class FileService extends BaseService {
 
     isFile(p: string): boolean {
         return !!path.extname(p);
+    }
+
+    public async newTextFile(): Promise<void> {
+        try {
+            await vscode.commands.executeCommand('workbench.action.files.newUntitledFile');
+        } catch (error) {
+            vscode.window.showErrorMessage(`Failed to open folder: ${error.message}`);
+        }
     }
 }
