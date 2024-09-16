@@ -49,7 +49,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     vscode.workspace.onDidChangeWorkspaceFolders(async (event) => {
         for (let folder of event.added) {
-            await folderService.addToRecentlyOpened({ uri: folder.uri, name: folder.name });
+            await folderService.addToRecentlyOpened(folder.uri, folder.name);
         }
     });
 
@@ -174,10 +174,11 @@ export function activate(context: vscode.ExtensionContext) {
         }
     }
 
+    var recentGroup: Group;
+
     function showDashboard(reveal: boolean = true) {
         var columnToShowIn = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : null;
-        var projects = projectService.getGroups();
-        var recentGroup: Group;
+        var projects = projectService.getGroups();     
 
         if (dashboardInfos.config.showRecentGroup) {
             recentGroup = projectService.getRecent(projects);

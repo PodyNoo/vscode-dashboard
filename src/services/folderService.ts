@@ -6,8 +6,8 @@ import BaseService from './baseService';
 import { Project } from '../models';
 
 export interface IRecentFolder {
-	readonly uri: vscode.Uri;
-	name?: string;
+	fsPath: string;
+	name: string;
 }
 
 export default class FolderService extends BaseService {
@@ -16,7 +16,7 @@ export default class FolderService extends BaseService {
         const currentFolders = vscode.workspace.workspaceFolders;
         if (currentFolders && currentFolders.length > 0) {
             for (let folder of currentFolders) {
-                this.addToRecentlyOpened({uri: folder.uri, name: folder.name});
+                this.addToRecentlyOpened(folder.uri, folder.name);
             }
         }
     }
@@ -26,13 +26,13 @@ export default class FolderService extends BaseService {
         return recentFolders;
     }
 
-    public async addToRecentlyOpened(folderToAdd: IRecentFolder): Promise<void> {
+    public async addToRecentlyOpened(uri: vscode.Uri, name: string): Promise<void> {
         const showRecentGroup: boolean = this.configurationSection.get('showRecentGroup');
         if (!showRecentGroup) return;
         const recentFolders = this.getRecentlyOpened();
-        if (recentFolders.findIndex(folder => folder.uri.path === folderToAdd.uri.path) === -1) {
-            if (await this.folderExists(folderToAdd.uri)) {
-                recentFolders.push(folderToAdd);
+        if (recentFolders.findIndex(folder => folder.fsPath === uri.fsPath) === -1) {
+            if (await this.folderExists(uri)) {
+                recentFolders.push({ fsPath: uri.fsPath, name: name });
                 await this.updateRecentlyOpened(recentFolders);
             }
         }
@@ -44,7 +44,7 @@ export default class FolderService extends BaseService {
 
     public async removeProjectFromRecentlyOpened(project: Project): Promise<void> {
         const recentFolders = this.getRecentlyOpened();
-        const recentFolderIndex = recentFolders.findIndex(folder => folder.uri.path === project.path);
+        const recentFolderIndex = recentFolders.findIndex(folder => folder.fsPath.trim() === project.path.trim());
         if (recentFolderIndex > -1) {
             recentFolders.splice(recentFolderIndex, 1);
             await this.updateRecentlyOpened(recentFolders);

@@ -43,13 +43,13 @@ export default class ProjectService extends BaseService {
             if (hidePinned) {
                 for (let group of groups) {
                     for (let project of group.projects) {
-                        if (project.path === recent.uri.path) {
+                        if (project.path === recent.fsPath) {
                             return;
                         }
                     }
                 }
             }
-            recentProjects.push(new Project(recent.name, recent.uri.path));
+            recentProjects.push(new Project(recent.name, recent.fsPath.trim()));
         });
         return new Group("Recent", recentProjects);
     }
