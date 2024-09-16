@@ -1,4 +1,10 @@
-# VSCode Project Dashboard
+# VSCode Project Dashboard Enhanced
+
+This is a fork of [Kruemelkatze/vscode-dashboard](https://github.com/Kruemelkatze/vscode-dashboard)
+
+This fork added features :
+- Display group of recent opened folders (with ability to add those to existing or new group)
+- Added buttons at the top of the dashboard to open a folder, create new text file and reload dashboard
 
 **VSCode Project Dashboard** is a Visual Studio Code extension that lets you organize your projects in a speed-dial like manner. Pin your frequently visited **folders**, **files**, and **SSH remotes** onto a dashboard to access them quickly.
 

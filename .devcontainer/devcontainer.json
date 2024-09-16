@@ -1,4 +1,4 @@
 {
-	"name": "vscode-dashboard-devcontainer",
+	"name": "vscode-dashboard-enhanced-devcontainer",
 	"image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm"
 }

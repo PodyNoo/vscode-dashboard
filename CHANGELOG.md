@@ -2,6 +2,17 @@
 
 All notable changes to the "Project Dashboard" extension will be documented in this file. It follows the [Keep a Changelog](http://keepachangelog.com/) recommendations.
 
+## [[2.7.0](https://github.com/podynoo/vscode-dashboard-enhanced/compare/2.6.0...2.7.0)] 2024-09-16
+
+### Added
+
+- Display group of recent opened folders (with ability to add those to existing or new group). ([b9475ab](https://github.com/podynoo/vscode-dashboard-enhanced/commit/b9475ab))
+- Added buttons at the top of the dashboard to open a folder, create new text file and reload dashboard. ([b9475ab](https://github.com/podynoo/vscode-dashboard-enhanced/commit/b9475ab))
+
+### Changed
+
+- Dashboard should now reload on configuration changes. ([b9475ab](https://github.com/podynoo/vscode-dashboard-enhanced/commit/b9475ab))
+
 ## [2.6.0] 2022-11-22
 
 ### Added
