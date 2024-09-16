@@ -2,7 +2,7 @@
     "name": "vscode-dashboard-enhanced",
     "displayName": "Project Dashboard Enhanced",
     "description": "Organize your workspaces in a speed-dial manner.",
-    "version": "2.7.0",
+    "version": "2.7.1",
     "publisher": "podynoo",
     "author": { "name": "kruemelkatze", "url": "https://github.com/Kruemelkatze/vscode-dashboard" },
     "icon": "media/extension_icon.png",

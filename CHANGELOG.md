@@ -2,6 +2,13 @@
 
 All notable changes to the "Project Dashboard" extension will be documented in this file. It follows the [Keep a Changelog](http://keepachangelog.com/) recommendations.
 
+## [[2.7.1](https://github.com/podynoo/vscode-dashboard-enhanced/compare/2.7.0...2.7.1)] 2024-09-16
+
+### Fixed
+
+- Wrong path were saved for recent projects. ([789ebf2](https://github.com/podynoo/vscode-dashboard-enhanced/commit/789ebf2bc0c1571c433748d4a4febf01bfff7e5c))
+- Folders should now be added in recent group. ([5c09fd4](https://github.com/podynoo/vscode-dashboard-enhanced/commit/5c09fd4c571007738e049ba8d0f29be40099812b))
+
 ## [[2.7.0](https://github.com/podynoo/vscode-dashboard-enhanced/compare/2.6.0...2.7.0)] 2024-09-16
 
 ### Added
