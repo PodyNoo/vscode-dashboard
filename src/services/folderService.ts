@@ -2,7 +2,6 @@
 "use strict";
 
 import * as vscode from 'vscode';
-import * as fs from 'fs';
 import BaseService from './baseService';
 import { Project } from '../models';
 
@@ -32,7 +31,7 @@ export default class FolderService extends BaseService {
         if (!showRecentGroup) return;
         const recentFolders = this.getRecentlyOpened();
         if (recentFolders.findIndex(folder => folder.uri.path === folderToAdd.uri.path) === -1) {
-            if (fs.existsSync(folderToAdd.uri.path)) {
+            if (await this.folderExists(folderToAdd.uri)) {
                 recentFolders.push(folderToAdd);
                 await this.updateRecentlyOpened(recentFolders);
             }
@@ -70,11 +69,12 @@ export default class FolderService extends BaseService {
         }
     }
 
-    public async newTextFile(): Promise<void> {
+    public async folderExists(uri: vscode.Uri): Promise<boolean> {
         try {
-            await vscode.commands.executeCommand('workbench.action.files.newUntitledFile');
+            const stat = await vscode.workspace.fs.stat(uri);
+            return stat.type === vscode.FileType.Directory;
         } catch (error) {
-            vscode.window.showErrorMessage(`Failed to open folder: ${error.message}`);
+            return false;
         }
     }
 }
