@@ -37,7 +37,8 @@ export function getDashboardContent(
     context: vscode.ExtensionContext,
     webview: vscode.Webview,
     groups: Group[],
-    infos: DashboardInfos
+    infos: DashboardInfos,
+    recentGroup?: Group
 ): string {
     var stylesPath = getMediaResource(context, webview, 'styles.css');
     var fittyPath = getMediaResource(context, webview, 'fitty.min.js');
@@ -101,7 +102,13 @@ export function getDashboardContent(
             <div class="groups-wrapper ${!infos.config.displayProjectPath ? 'hide-project-path' : ''}">
         ${groups.length
             ? groups
-                .map((group) => getGroupSection(group, groups.length, infos))
+                .map((group) => {
+                    if (recentGroup != null && group.id === recentGroup.id) {
+                        return getGroupSection(group, groups.length, infos, true)
+                    } else {
+                        return getGroupSection(group, groups.length, infos, false)
+                    }
+                })
                 .join('\n')
             : (infos.otherStorageHasData ? getImportDiv() : getNoProjectsDiv())
         }
@@ -143,13 +150,12 @@ export function getDashboardContent(
 function getGroupSection(
     group: Group,
     totalGroupCount: number,
-    infos: DashboardInfos
+    infos: DashboardInfos,
+    isRecentGroup: boolean
 ) {
     // Apply changes to HTML here also to getTempGroupSection
 
     var showAddProjectButton = infos.config.showAddProjectButtonTile;
-
-    const isRecentGroup = group.constructor.name === 'RecentGroup';
 
     return `
 <div class="group ${group.collapsed ? 'collapsed' : ''} ${group.projects.length === 0 ? 'no-projects' : ''

@@ -185,7 +185,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
 
         if (instance) {
-            instance.webview.html = getDashboardContent(context, instance.webview, projects, dashboardInfos);
+            instance.webview.html = getDashboardContent(context, instance.webview, projects, dashboardInfos, recentGroup);
             if (reveal) {
                 instance.reveal(columnToShowIn);
             }
@@ -203,7 +203,7 @@ export function activate(context: vscode.ExtensionContext) {
             );
             panel.iconPath = vscode.Uri.file(path.join(context.extensionPath, 'media', 'icon.svg'));
 
-            panel.webview.html = getDashboardContent(context, panel.webview, projects, dashboardInfos);
+            panel.webview.html = getDashboardContent(context, panel.webview, projects, dashboardInfos, recentGroup);
 
             // Reset when the current panel is closed
             panel.onDidDispose(() => {

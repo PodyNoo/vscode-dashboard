@@ -2,7 +2,7 @@
 
 import * as vscode from 'vscode';
 
-import { Project, Group, RecentGroup } from "../models";
+import { Project, Group } from "../models";
 import { ADD_NEW_PROJECT_TO_FRONT, PROJECTS_KEY, StorageOption } from "../constants";
 import BaseService from './baseService';
 import ColorService from './colorService';
@@ -51,7 +51,7 @@ export default class ProjectService extends BaseService {
             }
             recentProjects.push(new Project(recent.name, recent.uri.path));
         });
-        return new RecentGroup("Recent", recentProjects);
+        return new Group("Recent", recentProjects);
     }
 
     getProjectsFlat(): Project[] {
