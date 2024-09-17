@@ -59,10 +59,12 @@ export function activate(context: vscode.ExtensionContext) {
     const projectService = new ProjectService(context, colorService, folderService);
     const fileService = new FileService(context);
 
-    vscode.workspace.onDidChangeWorkspaceFolders(async (event) => {
-        for (let folder of event.added) {
-            await folderService.addToRecentlyOpened(folder.uri, folder.name);
-        }
+    vscode.workspace.onDidChangeWorkspaceFolders(async () => {
+        await folderService.refreshRecentlyOpened();
+    });
+
+    vscode.window.onDidChangeVisibleTextEditors(async() => {
+        await folderService.refreshRecentlyOpened(true);
     });
 
     const provider = new SidebarDummyDashboardViewProvider(context.extensionUri);
