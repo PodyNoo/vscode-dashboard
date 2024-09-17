@@ -1,7 +1,7 @@
 import BaseService from "./baseService";
 import * as fs from 'fs';
 import * as path from 'path';
-import * as vscode from 'vscode'
+import * as vscode from 'vscode';
 
 import { ProjectPathType } from "../models";
 

@@ -28,7 +28,9 @@ export default class FolderService extends BaseService {
 
     public async addToRecentlyOpened(uri: vscode.Uri, name: string): Promise<void> {
         const showRecentGroup: boolean = this.configurationSection.get('showRecentGroup');
-        if (!showRecentGroup) return;
+        if (!showRecentGroup) {
+            return;
+        }
         const recentFolders = this.getRecentlyOpened();
         if (recentFolders.findIndex(folder => folder.fsPath === uri.fsPath) === -1) {
             if (await this.folderExists(uri)) {

@@ -12,14 +12,14 @@ import BaseService from './baseService';
 // which would work with only one array
 const uniqBy = (arr, iteratee) => {
     if (typeof iteratee === 'string') {
-        const prop = iteratee
-        iteratee = item => item[prop]
+        const prop = iteratee;
+        iteratee = item => item[prop];
     }
 
     return arr.filter(
         (x, i, self) => i === self.findIndex(y => iteratee(x) === iteratee(y))
-    )
-}
+    );
+};
 
 export default class ColorService extends BaseService {
 
@@ -136,12 +136,15 @@ export default class ColorService extends BaseService {
             g = (+split[1]).toString(16),
             b = (+split[2]).toString(16);
 
-        if (r.length == 1)
+        if (r.length === 1) {
             r = "0" + r;
-        if (g.length == 1)
+        }
+        if (g.length === 1) {
             g = "0" + g;
-        if (b.length == 1)
+        }
+        if (b.length === 1) {
             b = "0" + b;
+        }
 
         return "#" + r + g + b;
     }

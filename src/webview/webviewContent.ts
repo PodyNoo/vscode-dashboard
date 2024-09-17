@@ -104,9 +104,9 @@ export function getDashboardContent(
             ? groups
                 .map((group) => {
                     if (recentGroup != null && group.id === recentGroup.id) {
-                        return getGroupSection(group, groups.length, infos, true)
+                        return getGroupSection(group, groups.length, infos, true);
                     } else {
-                        return getGroupSection(group, groups.length, infos, false)
+                        return getGroupSection(group, groups.length, infos, false);
                     }
                 })
                 .join('\n')

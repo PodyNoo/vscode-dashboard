@@ -45,12 +45,15 @@ var ntc = {
     name: function (color): any[] {
 
         color = color.toUpperCase();
-        if (color.length < 3 || color.length > 7)
+        if (color.length < 3 || color.length > 7) {
             return ["#000000", "Invalid Color: " + color, false];
-        if (color.length % 3 == 0)
+        }
+        if (color.length % 3 === 0) {
             color = "#" + color;
-        if (color.length == 4)
+        }
+        if (color.length === 4) {
             color = "#" + color.substr(1, 1) + color.substr(1, 1) + color.substr(2, 1) + color.substr(2, 1) + color.substr(3, 1) + color.substr(3, 1);
+        }
 
         var rgb = ntc.rgb(color);
         var r = rgb[0], g = rgb[1], b = rgb[2];
@@ -60,8 +63,9 @@ var ntc = {
         var cl = -1, df = -1;
 
         for (var i = 0; i < ntc.names.length; i++) {
-            if (color == "#" + ntc.names[i][0])
+            if (color === "#" + ntc.names[i][0]) {
                 return ["#" + ntc.names[i][0], ntc.names[i][1], true];
+            }
 
             ndf1 = Math.pow(r - this.names[i][2], 2) + Math.pow(g - this.names[i][3], 2) + Math.pow(b - this.names[i][4], 2);
             ndf2 = Math.pow(h - this.names[i][5], 2) + Math.pow(s - this.names[i][6], 2) + Math.pow(l - this.names[i][7], 2);
@@ -89,14 +93,21 @@ var ntc = {
         l = (min + max) / 2;
 
         s = 0;
-        if (l > 0 && l < 1)
+        if (l > 0 && l < 1) {
             s = delta / (l < 0.5 ? (2 * l) : (2 - 2 * l));
+        }
 
         h = 0;
         if (delta > 0) {
-            if (max == r && max != g) h += (g - b) / delta;
-            if (max == g && max != b) h += (2 + (b - r) / delta);
-            if (max == b && max != r) h += (4 + (r - g) / delta);
+            if (max === r && max !== g) {
+                h += (g - b) / delta;
+            }
+            if (max === g && max !== b) {
+                h += (2 + (b - r) / delta);
+            }
+            if (max === b && max !== r) {
+                h += (4 + (r - g) / delta);
+            }
             h /= 6;
         }
         return [parseInt((h * 255) as any), parseInt((s * 255) as any), parseInt((l * 255) as any)];
@@ -1682,7 +1693,7 @@ var ntc = {
         return this.names[Math.floor(Math.random() * this.names.length)];
     }
 
-}
+};
 
 ntc.init();
 

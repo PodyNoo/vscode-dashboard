@@ -15,12 +15,14 @@ function initProjects() {
     }
 
     function onAddProjectClicked(e) {
-        if (!e.target)
+        if (!e.target) {
             return;
+        }
 
         var projectDiv = e.target.closest('.project');
-        if (!projectDiv)
+        if (!projectDiv) {
             return;
+        }
 
         var groupId = projectDiv.getAttribute("data-group-id");
 
@@ -31,8 +33,9 @@ function initProjects() {
     }
 
     function onImportFromOtherStorageClicked(e) {
-        if (!e.target)
+        if (!e.target) {
             return;
+        }
 
         window.vscode.postMessage({
             type: 'import-from-other-storage',
@@ -42,11 +45,13 @@ function initProjects() {
     function onInsideProjectClick(e, projectDiv) {
         projectDiv = projectDiv || e.target.closest(".project");
         var dataId = projectDiv && projectDiv.getAttribute("data-id");
-        if (dataId == null)
+        if (dataId == null) {
             return;
+        }
 
-        if (onTriggerProjectAction(e.target, dataId))
+        if (onTriggerProjectAction(e.target, dataId)) {
             return;
+        }
 
         var newWindow = e.ctrlKey || e.metaKey || e.button === 1;
         openProject(dataId, newWindow ? ProjectOpenType.NewWindow : ProjectOpenType.Default);
@@ -55,13 +60,15 @@ function initProjects() {
 
     function onInsideGroupClick(e, groupDiv) {
         var groupId = groupDiv.getAttribute("data-group-id");
-        if (groupId == null)
+        if (groupId == null) {
             return;
+        }
 
-        var actionDiv = e.target.closest('[data-action]')
+        var actionDiv = e.target.closest('[data-action]');
         var action = actionDiv != null ? actionDiv.getAttribute("data-action") : null;
-        if (!action)
+        if (!action) {
             return;
+        }
 
         if (action === "add") {
             window.vscode.postMessage({
@@ -83,13 +90,15 @@ function initProjects() {
     }
 
     function onTriggerProjectAction(target, projectId) {
-        var actionDiv = target.closest('[data-action]')
-        if (actionDiv == null)
+        var actionDiv = target.closest('[data-action]');
+        if (actionDiv == null){
             return false;
+        }
 
         var action = actionDiv.getAttribute("data-action");
-        if (!action)
+        if (!action) {
             return false;
+        }
 
         window.vscode.postMessage({
             type: action + '-project',
@@ -105,9 +114,10 @@ function initProjects() {
         closeContextMenus(); // Close previews
 
         var projectDiv = e.target.closest('.project[data-id]');
-        var groupDiv = e.target.closest('.group-title')
-        if (!projectDiv && !groupDiv)
+        var groupDiv = e.target.closest('.group-title');
+        if (!projectDiv && !groupDiv) {
             return;
+        }
 
         e.preventDefault();
 
@@ -115,15 +125,17 @@ function initProjects() {
         var contextMenuElement;
         if (contextMenuForProject) {
             contextMenuProjectId = projectDiv.getAttribute("data-id");
-            if (contextMenuProjectId == null)
+            if (contextMenuProjectId == null) {
                 return;
+            }
 
             contextMenuElement = document.getElementById("projectContextMenu");
         } else {
             let groupIdDiv = groupDiv.closest(".group[data-group-id]");
             contextMenuGroupId = groupIdDiv ? groupIdDiv.getAttribute("data-group-id") : null;
-            if (contextMenuGroupId == null)
+            if (contextMenuGroupId == null) {
                 return;
+            }
 
             contextMenuElement = document.getElementById("groupContextMenu");
         }
@@ -153,8 +165,9 @@ function initProjects() {
     function onProjectContextMenuActionClicked(el) {
         var action = el.getAttribute("data-action");
 
-        if (action == null || contextMenuProjectId == null)
+        if (action == null || contextMenuProjectId == null) {
             return;
+        }
 
         switch (action) {
             case 'open':
@@ -180,8 +193,9 @@ function initProjects() {
     function onGroupContextMenuActionClicked(el) {
         var action = el.getAttribute("data-action");
 
-        if (action == null || contextMenuGroupId == null)
+        if (action == null || contextMenuGroupId == null) {
             return;
+        }
 
         switch (action) {
             case 'add':
@@ -210,8 +224,9 @@ function initProjects() {
     }
 
     function onMouseEvent(e) {
-        if (!e.target || e.target.closest(".disabled"))
+        if (!e.target || e.target.closest(".disabled")) {
             return;
+        }
 
         var contextMenuElement = e.target.closest("#projectContextMenu [data-action]");
         if (contextMenuElement) {
@@ -294,8 +309,9 @@ function initProjects() {
         );
 
     document.addEventListener('contextmenu', (e) => {
-        if (!e.target)
+        if (!e.target) {
             return;
+        }
 
         onContextMenu(e);
     });

@@ -50,7 +50,7 @@ export function activate(context: vscode.ExtensionContext) {
                 vscode.commands.executeCommand("workbench.view.explorer");
                 showDashboard();
             }
-        }
+        };
     }
 
     var instance: vscode.WebviewPanel = null;
@@ -74,8 +74,8 @@ export function activate(context: vscode.ExtensionContext) {
         relevantExtensionsInstalls: {
             remoteSSH: false,
         },
-        get config() { return vscode.workspace.getConfiguration('dashboard') },
-        get otherStorageHasData() { return projectService.otherStorageHasData() },
+        get config() { return vscode.workspace.getConfiguration('dashboard'); },
+        get otherStorageHasData() { return projectService.otherStorageHasData(); },
     };
 
     const openCommand = vscode.commands.registerCommand('dashboard.open', () => {
@@ -194,7 +194,7 @@ export function activate(context: vscode.ExtensionContext) {
 
         if (dashboardInfos.config.showRecentGroup) {
             recentGroup = projectService.getRecent(projects);
-            projects.push(recentGroup)
+            projects.push(recentGroup);
         }
 
         if (instance) {
@@ -310,7 +310,7 @@ export function activate(context: vscode.ExtensionContext) {
             });
             panel.onDidDispose(() => {
                 instance = null;
-            })
+            });
 
             instance = panel;
         }
@@ -392,8 +392,9 @@ export function activate(context: vscode.ExtensionContext) {
                 openLabel: 'Select Folder containing Projects',
             });
 
-            if (!folderPath || folderPath.length === 0)
+            if (!folderPath || folderPath.length === 0) {
                 return;
+            }
 
             let foldersInPath = await fileService.getFolders(folderPath[0].fsPath);
             let folderName = path.basename(folderPath[0].fsPath);
@@ -492,7 +493,7 @@ export function activate(context: vscode.ExtensionContext) {
 
                 if (hasRemoteFolder) {
                     uri = vscode.Uri.parse(projectPath);
-                    vscode.commands.executeCommand("vscode.openFolder", uri, openInNewWindow)
+                    vscode.commands.executeCommand("vscode.openFolder", uri, openInNewWindow);
                 } else {
                     vscode.commands.executeCommand("vscode.newWindow", {
                         remoteAuthority: projectPath.replace("vscode-remote://", ""),
@@ -540,7 +541,7 @@ export function activate(context: vscode.ExtensionContext) {
         let workspaceFolders = new Set((vscode.workspace.workspaceFolders || []).map(w => path.normalize(w.uri.fsPath)));
         wsToAdd = wsToAdd.filter(ws => {
             return !workspaceFolders.has(path.normalize(ws.uri.fsPath));
-        })
+        });
 
         if (!wsToAdd.length) {
             return;
@@ -692,7 +693,7 @@ export function activate(context: vscode.ExtensionContext) {
                         id: true,
                         label: "Edit Path"
                     },
-                ]
+                ];
                 let updatePath = await vscode.window.showQuickPick(updatePathPicks, {
                     placeHolder: "Edit Path?"
                 });
@@ -756,7 +757,7 @@ export function activate(context: vscode.ExtensionContext) {
                 return {
                     id: group.id,
                     label,
-                }
+                };
             });
 
             if (optionForAdding) {
@@ -983,7 +984,7 @@ export function activate(context: vscode.ExtensionContext) {
                     recentColorPicks.unshift({
                         id: null,
                         label: "(Back)",
-                    })
+                    });
 
                     let selectedRecentColor = await vscode.window.showQuickPick(recentColorPicks, {
                         placeHolder: recentColorPicks.length ? 'Recent Color' : 'No colors have recently been used.',
@@ -1004,7 +1005,7 @@ export function activate(context: vscode.ExtensionContext) {
                     break;
                 default:
                     // PredefinedColor
-                    let predefinedColor = PREDEFINED_COLORS.find(c => c.label == selectedColorPick.id || c.value == selectedColorPick.id);
+                    let predefinedColor = PREDEFINED_COLORS.find(c => c.label === selectedColorPick.id || c.value === selectedColorPick.id);
                     if (predefinedColor != null) {
                         color = predefinedColor.value;
                     } else {
@@ -1022,10 +1023,11 @@ export function activate(context: vscode.ExtensionContext) {
 
         let selectedProjectPick = await vscode.window.showQuickPick(projectPicks);
 
-        if (selectedProjectPick == null)
+        if (selectedProjectPick == null) {
             return;
+        }
 
-        await projectService.removeProject(selectedProjectPick.id)
+        await projectService.removeProject(selectedProjectPick.id);
         showDashboard();
     }
 
@@ -1048,13 +1050,13 @@ export function activate(context: vscode.ExtensionContext) {
 
         var subscriptions: vscode.Disposable[] = [];
         var editSubscription = vscode.workspace.onWillSaveTextDocument(async (e) => {
-            if (e.document == editProjectsDocument) {
+            if (e.document === editProjectsDocument) {
                 let updatedGroups;
                 try {
                     var text = e.document.getText() || "[]";
                     updatedGroups = JSON.parse(text);
                 } catch (ex) {
-                    vscode.window.showErrorMessage("Edited Projects File can not be parsed.")
+                    vscode.window.showErrorMessage("Edited Projects File can not be parsed.");
                     return;
                 }
 
@@ -1073,7 +1075,7 @@ export function activate(context: vscode.ExtensionContext) {
                         if (group && group.groupName == null && (group.projects == null || !group.projects.length)) {
                             // Remove empty, unnamed group
                             group._delete = true;
-                        } else if (!group || !group.id || group.groupName == undefined || !group.projects || !Array.isArray(group.projects)) {
+                        } else if (!group || !group.id || group.groupName === undefined || !group.projects || !Array.isArray(group.projects)) {
                             jsonIsInvalid = true;
                             break;
                         } else {
@@ -1106,9 +1108,9 @@ export function activate(context: vscode.ExtensionContext) {
                 // Select and close our document editor
                 try {
                     await vscode.window.showTextDocument(e.document);
-                    await vscode.commands.executeCommand('workbench.action.closeActiveEditor')
+                    await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
                 } catch (e) {
-                    vscode.window.showErrorMessage("Could not close the edited Projects File. Please close manually.")
+                    vscode.window.showErrorMessage("Could not close the edited Projects File. Please close manually.");
                 }
 
                 showDashboard();

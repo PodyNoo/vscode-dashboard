@@ -37,7 +37,7 @@ export default class ProjectService extends BaseService {
 
     getRecent(groups: Group[]): Group {
         const recents = this.folderService.getRecentlyOpened();
-        const recentProjects: Project[] = []
+        const recentProjects: Project[] = [];
         const hidePinned: boolean = this.configurationSection.get('hideProjectAlreadyInGroupFromRecent');
         recents.forEach(recent => {
             if (hidePinned) {
