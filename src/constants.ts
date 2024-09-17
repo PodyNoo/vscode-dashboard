@@ -24,12 +24,12 @@ export const REOPEN_KEY = 'reopenDashboardReason';
 export enum StorageOption {
     GlobalState,
     Settings,
-}
+};
 
 export const FITTY_OPTIONS = {
     maxSize: '40',
     // minSize: '20', // Apparently, fitty has a problem with our setup and will overflow text if minSize is set...
-}
+};
 
 export const USER_CANCELED = "CanceledByUser"; // A symbol would be nice, but throw new Error(Symbol) does not work
 export const ADD_NEW_PROJECT_TO_FRONT = false;

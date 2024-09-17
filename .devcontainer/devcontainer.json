@@ -1,4 +1,13 @@
 {
 	"name": "vscode-dashboard-enhanced-devcontainer",
-	"image": "mcr.microsoft.com/devcontainers/javascript-node:1-20-bookworm"
+	"image": "mcr.microsoft.com/devcontainers/javascript-node:1-20-bookworm",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"dbaeumer.vscode-eslint",
+				"amodio.tsl-problem-matcher",
+				"ms-vscode.extension-test-runner"
+			]
+		}
+	}
 }

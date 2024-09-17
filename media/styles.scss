@@ -117,7 +117,9 @@ body {
         .collapse-icon {
             @include actions(0.6em, 0);
 
-            padding-right: 2px;
+            & {
+                padding-right: 2px;
+            }
 
             svg {
                 transition: transform $defaultTransition;
