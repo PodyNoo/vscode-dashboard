@@ -9,5 +9,8 @@
 				"ms-vscode.extension-test-runner"
 			]
 		}
+	},
+	"containerEnv": {
+		"WATCHPACK_POLLING": "1000"
 	}
 }

@@ -13,6 +13,18 @@ import FileService from './services/fileService';
 import FolderService from './services/folderService';
 
 export function activate(context: vscode.ExtensionContext) {
+    // To reload vscode window (and extension) when webpack compile on changes
+    if (process.env.NODE_ENV === "development") {
+        const distPath = path.resolve(__dirname);
+        const watcher = vscode.workspace.createFileSystemWatcher(
+            new vscode.RelativePattern(`${distPath}`, '*.js')
+        );
+
+        watcher.onDidChange(({ scheme, path }) => {
+            console.info(`the ${scheme} "${path}" has changed ! Will reload VSCode window.`);
+            vscode.commands.executeCommand('workbench.action.reloadWindow');
+        });
+    }
 
     class SidebarDummyDashboardViewProvider implements vscode.WebviewViewProvider {
 
