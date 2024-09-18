@@ -59,13 +59,11 @@ export function activate(context: vscode.ExtensionContext) {
     const projectService = new ProjectService(context, colorService, recentService);
     const fileService = new FileService(context);
 
-    vscode.workspace.onDidChangeWorkspaceFolders(async () => {
-        await recentService.refreshRecentlyOpened();
-    });
-
-    vscode.window.onDidChangeVisibleTextEditors(async() => {
-        await recentService.refreshRecentlyOpened(true);
-    });
+    let showDashboardTimeoutId = null;
+    context.subscriptions.push(recentService.onDidRecentlyOpenedChanged(() => {
+        clearTimeout(showDashboardTimeoutId);
+        showDashboardTimeoutId = setTimeout(() => { showDashboard(false); }, 300);
+    }));
 
     const provider = new SidebarDummyDashboardViewProvider(context.extensionUri);
 
@@ -1234,9 +1232,6 @@ export function activate(context: vscode.ExtensionContext) {
         }
     }
 }
-
-
-
 
 // this method is called when your extension is deactivated
 export function deactivate() {

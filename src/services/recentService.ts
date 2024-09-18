@@ -5,6 +5,7 @@ import * as vscode from 'vscode';
 import BaseService from './baseService';
 import { Project } from '../models';
 import * as path from 'path';
+import { EventEmitter } from 'events';
 
 export interface IRecent {
 	fsPath: string;
@@ -12,11 +13,17 @@ export interface IRecent {
 }
 
 const GLOBAL_STATE_RECENT_KEY = 'recentList';
+const RECENTLY_CHANGED_EMIT = 'recentListChanged';
+const DEBOUNCE_MS = 300;
 
 export default class RecentService extends BaseService {
+    private _recentlyChangedEmitter: EventEmitter;
+
     constructor(context: vscode.ExtensionContext) {
         super(context);
+        this._recentlyChangedEmitter = new EventEmitter();
         this.refreshRecentlyOpened();
+        this.initWatchForChanges();
     }
 
     public getRecentlyOpened(): IRecent[] {
@@ -59,7 +66,17 @@ export default class RecentService extends BaseService {
         await this.updateRecentlyOpened([]);
     }
 
+    public onDidRecentlyOpenedChanged(listener: () => void): vscode.Disposable {
+        this._recentlyChangedEmitter.on(RECENTLY_CHANGED_EMIT, listener);
+        return { 
+            dispose: () => {
+                this._recentlyChangedEmitter.off(RECENTLY_CHANGED_EMIT, listener);
+            }
+        };
+    }
+
     private async addToRecentlyOpened(uri: vscode.Uri, name?: string): Promise<void> {
+        let recentlyOpenedHasChanged = false;
         if (name === undefined) {
             name = path.basename(uri.fsPath);
         }
@@ -68,7 +85,11 @@ export default class RecentService extends BaseService {
             if (await this.pathExists(uri)) {
                 recents.push({ fsPath: uri.fsPath, name: name });
                 await this.updateRecentlyOpened(recents);
+                recentlyOpenedHasChanged = true;
             }
+        }
+        if (recentlyOpenedHasChanged) {
+            this._recentlyChangedEmitter.emit(RECENTLY_CHANGED_EMIT);
         }
     }
 
@@ -107,5 +128,33 @@ export default class RecentService extends BaseService {
         }
 
         return externalFiles;
+    }
+
+    private initWatchForChanges() {
+        let refreshRecentlyOpenedTimeoutId = null;
+        let refreshRecentlyOpenedFilesTimeoutId = null;
+
+        this.context.subscriptions.push(vscode.workspace.onDidChangeWorkspaceFolders(async () => {
+            clearTimeout(refreshRecentlyOpenedTimeoutId);
+            if (refreshRecentlyOpenedFilesTimeoutId !== null) {
+                clearTimeout(refreshRecentlyOpenedFilesTimeoutId);
+            }
+            refreshRecentlyOpenedTimeoutId = setTimeout(async () => {
+                await this.refreshRecentlyOpened();
+                refreshRecentlyOpenedTimeoutId = null;
+            }, DEBOUNCE_MS);
+        }));
+
+        this.context.subscriptions.push(vscode.window.onDidChangeVisibleTextEditors(async() => {
+            clearTimeout(refreshRecentlyOpenedFilesTimeoutId);
+            if (refreshRecentlyOpenedTimeoutId === null) {
+                refreshRecentlyOpenedFilesTimeoutId = setTimeout(async () => {
+                    await this.refreshRecentlyOpened(true);
+                    refreshRecentlyOpenedFilesTimeoutId = null;
+                }, DEBOUNCE_MS);
+            } else {
+                refreshRecentlyOpenedFilesTimeoutId = null;
+            }
+        }));
     }
 }
