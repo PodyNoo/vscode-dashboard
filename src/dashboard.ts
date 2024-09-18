@@ -299,8 +299,14 @@ export function activate(context: vscode.ExtensionContext) {
                     case 'empty-recent-group':
                         await emptyRecentGroup();
                         break;
+                    case 'open-file':
+                        await fileService.openDialog(ProjectPathType.File);
+                        break;
                     case 'open-folder':
-                        await fileService.openFolder();
+                        await fileService.openDialog(ProjectPathType.Folder);
+                        break;
+                    case 'open-workspace':
+                        await fileService.openDialog(ProjectPathType.WorkspaceFile);
                         break;
                     case 'new-text-file':
                         await fileService.newTextFile();

@@ -72,20 +72,46 @@ export default class FileService extends BaseService {
         }
     }
 
-    public async openFolder(): Promise<void> {
-        const result = await vscode.window.showOpenDialog({
-            canSelectFiles: false,
-            canSelectFolders: true,
-            canSelectMany: false,
-            openLabel: 'Open Folder'
-        });
+    public async openDialog(type: ProjectPathType): Promise<void> {
+        let dialogOption: vscode.OpenDialogOptions;
+        let command: string;
 
+        switch (type) {
+            case ProjectPathType.File:
+                dialogOption = {
+                    canSelectFiles: true,
+                    canSelectMany: true,
+                    openLabel: 'Open File'
+                };
+                command = "vscode.open";
+                break;
+            case ProjectPathType.Folder:
+                dialogOption = {
+                    canSelectFiles: false,
+                    canSelectFolders: true,
+                    canSelectMany: false,
+                    openLabel: 'Open Folder'
+                };
+                command = "vscode.openFolder";
+                break;
+            case ProjectPathType.WorkspaceFile:
+                dialogOption = {
+                    canSelectFiles: true,
+                    canSelectMany: false,
+                    filters: { 'Code Workspace': ['code-workspace'] },
+                    openLabel: 'Open Workspace from File'
+                };
+                command = "vscode.openFolder";
+                break;
+        }
+
+        const result = await vscode.window.showOpenDialog(dialogOption);
         if (result && result.length > 0) {
-            const folderUri = result[0];
+            const uri = result[0];
             try {
-                await vscode.commands.executeCommand('vscode.openFolder', folderUri);
+                await vscode.commands.executeCommand(command, uri);
             } catch (error) {
-                vscode.window.showErrorMessage(`Failed to open folder: ${error.message}`);
+                vscode.window.showErrorMessage(`Failed to ${dialogOption.openLabel}: ${error.message}`);
             }
         }
     }

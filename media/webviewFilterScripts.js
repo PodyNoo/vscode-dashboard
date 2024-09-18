@@ -128,7 +128,7 @@ function initFiltering(activeByDefault) {
                 .replaceAll('\.', '\\.')
                 .replaceAll('*', '.*')
                 .replaceAll('?', '.');
-            return new RegExp(rx)
+            return new RegExp(rx);
         } catch (e) {
             return new RegExp(globLike);
         }

@@ -94,8 +94,8 @@ export function getDashboardContent(
         <div class="top-action-btn new-text-file">
             <span data-action="new-text-file" title="New Text File">${Icons.file}</span>
         </div>
-        <div class="top-action-btn open-folder">
-            <span data-action="open-folder" title="Open Folder">${Icons.folder}</span>
+        <div class="top-action-btn open-btn">
+            <span data-action="open-dialog" title="Open Folder (On click, hold SHIFT to open a file, and CTRL to open a workspace)">${Icons.folder}</span>
         </div>
         ` : '' }
         <div class="">

@@ -275,9 +275,16 @@ function initProjects() {
             return;
         }
 
-        if (e.target.closest('[data-action="open-folder"]')) {
+        if (e.target.closest('[data-action="open-dialog"]')) {
+            let type = 'open-folder';
+            if (e.ctrlKey) {
+                type = 'open-workspace';
+            }
+            if (e.shiftKey) {
+                type = 'open-file';
+            }
             window.vscode.postMessage({
-                type: 'open-folder'
+                type: type
             });
             return;
         }
