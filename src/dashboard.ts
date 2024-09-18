@@ -10,7 +10,7 @@ import { lstatSync } from 'fs';
 import ColorService from './services/colorService';
 import ProjectService from './services/projectService';
 import FileService from './services/fileService';
-import FolderService from './services/folderService';
+import RecentService from './services/recentService';
 
 export function activate(context: vscode.ExtensionContext) {
     // To reload vscode window (and extension) when webpack compile on changes
@@ -55,16 +55,16 @@ export function activate(context: vscode.ExtensionContext) {
 
     var instance: vscode.WebviewPanel = null;
     const colorService = new ColorService(context);
-    const folderService = new FolderService(context);
-    const projectService = new ProjectService(context, colorService, folderService);
+    const recentService = new RecentService(context);
+    const projectService = new ProjectService(context, colorService, recentService);
     const fileService = new FileService(context);
 
     vscode.workspace.onDidChangeWorkspaceFolders(async () => {
-        await folderService.refreshRecentlyOpened();
+        await recentService.refreshRecentlyOpened();
     });
 
     vscode.window.onDidChangeVisibleTextEditors(async() => {
-        await folderService.refreshRecentlyOpened(true);
+        await recentService.refreshRecentlyOpened(true);
     });
 
     const provider = new SidebarDummyDashboardViewProvider(context.extensionUri);
@@ -300,7 +300,7 @@ export function activate(context: vscode.ExtensionContext) {
                         await emptyRecentGroup();
                         break;
                     case 'open-folder':
-                        await folderService.openFolder();
+                        await recentService.openFolder();
                         break;
                     case 'new-text-file':
                         await fileService.newTextFile();
@@ -450,7 +450,7 @@ export function activate(context: vscode.ExtensionContext) {
     }
 
     async function emptyRecentGroup() {
-        await folderService.updateRecentlyOpened([]);
+        await recentService.updateRecentlyOpened([]);
 
         let accepted = await vscode.window.showWarningMessage(`Empty all recents folders ?`, { modal: true }, 'Empty');
         if (!accepted) {
@@ -1143,7 +1143,7 @@ export function activate(context: vscode.ExtensionContext) {
             return;
         }
 
-        await folderService.removeProjectFromRecentlyOpened(recentProject);
+        await recentService.removeProjectFromRecentlyOpened(recentProject);
 
         showDashboard();
     }

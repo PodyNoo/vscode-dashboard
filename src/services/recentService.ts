@@ -11,7 +11,7 @@ export interface IRecentFolder {
 	name: string;
 }
 
-export default class FolderService extends BaseService {
+export default class RecentService extends BaseService {
     constructor(context: vscode.ExtensionContext) {
         super(context);
         this.refreshRecentlyOpened();
