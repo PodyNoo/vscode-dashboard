@@ -205,6 +205,9 @@ export function activate(context: vscode.ExtensionContext) {
                 instance.reveal(columnToShowIn);
             }
         } else {
+            if (!reveal) {
+                return;
+            }
             var panel = vscode.window.createWebviewPanel(
                 "dashboard",
                 "Project Dashboard",
