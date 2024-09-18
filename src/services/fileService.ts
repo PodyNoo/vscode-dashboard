@@ -71,4 +71,22 @@ export default class FileService extends BaseService {
             vscode.window.showErrorMessage(`Failed to open folder: ${error.message}`);
         }
     }
+
+    public async openFolder(): Promise<void> {
+        const result = await vscode.window.showOpenDialog({
+            canSelectFiles: false,
+            canSelectFolders: true,
+            canSelectMany: false,
+            openLabel: 'Open Folder'
+        });
+
+        if (result && result.length > 0) {
+            const folderUri = result[0];
+            try {
+                await vscode.commands.executeCommand('vscode.openFolder', folderUri);
+            } catch (error) {
+                vscode.window.showErrorMessage(`Failed to open folder: ${error.message}`);
+            }
+        }
+    }
 }

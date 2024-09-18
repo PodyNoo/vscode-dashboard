@@ -6,10 +6,12 @@ import BaseService from './baseService';
 import { Project } from '../models';
 import * as path from 'path';
 
-export interface IRecentFolder {
+export interface IRecent {
 	fsPath: string;
 	name: string;
 }
+
+const GLOBAL_STATE_RECENT_KEY = 'recentList';
 
 export default class RecentService extends BaseService {
     constructor(context: vscode.ExtensionContext) {
@@ -17,22 +19,8 @@ export default class RecentService extends BaseService {
         this.refreshRecentlyOpened();
     }
 
-    public getRecentlyOpened(): IRecentFolder[] {
-        const recentFolders = this.context.globalState.get<IRecentFolder[]>('recentFolders', []);
-        return recentFolders;
-    }
-
-    public async addToRecentlyOpened(uri: vscode.Uri, name?: string): Promise<void> {
-        if (name === undefined) {
-            name = path.basename(uri.fsPath);
-        }
-        const recentFolders = this.getRecentlyOpened();
-        if (recentFolders.findIndex(folder => folder.fsPath === uri.fsPath) === -1) {
-            if (await this.pathExists(uri)) {
-                recentFolders.push({ fsPath: uri.fsPath, name: name });
-                await this.updateRecentlyOpened(recentFolders);
-            }
-        }
+    public getRecentlyOpened(): IRecent[] {
+        return this.context.globalState.get<IRecent[]>(GLOBAL_STATE_RECENT_KEY, []);
     }
 
     public async refreshRecentlyOpened(onlyFiles: boolean = false) {
@@ -50,47 +38,45 @@ export default class RecentService extends BaseService {
         }
 
         // Add folders
-        const currentFolders = vscode.workspace.workspaceFolders;
-        if (currentFolders && currentFolders.length > 0) {
-            for (let folder of currentFolders) {
+        const workspaceFolders = vscode.workspace.workspaceFolders;
+        if (workspaceFolders && workspaceFolders.length > 0) {
+            for (let folder of workspaceFolders) {
                 this.addToRecentlyOpened(folder.uri, folder.name);
             }
         }
     }
 
-
-    public async updateRecentlyOpened(recentFolders: IRecentFolder[]): Promise<void> {
-        await this.context.globalState.update('recentFolders', recentFolders);
-    }
-
     public async removeProjectFromRecentlyOpened(project: Project): Promise<void> {
-        const recentFolders = this.getRecentlyOpened();
-        const recentFolderIndex = recentFolders.findIndex(folder => folder.fsPath.trim() === project.path.trim());
-        if (recentFolderIndex > -1) {
-            recentFolders.splice(recentFolderIndex, 1);
-            await this.updateRecentlyOpened(recentFolders);
+        const recents = this.getRecentlyOpened();
+        const projectIndex = recents.findIndex(folder => folder.fsPath.trim() === project.path.trim());
+        if (projectIndex > -1) {
+            recents.splice(projectIndex, 1);
+            await this.updateRecentlyOpened(recents);
         }
     }
 
-    public async openFolder(): Promise<void> {
-        const result = await vscode.window.showOpenDialog({
-            canSelectFiles: false,
-            canSelectFolders: true,
-            canSelectMany: false,
-            openLabel: 'Open Folder'
-        });
+    public async resetRecentlyOpened(): Promise<void> {
+        await this.updateRecentlyOpened([]);
+    }
 
-        if (result && result.length > 0) {
-            const folderUri = result[0];
-            try {
-                await vscode.commands.executeCommand('vscode.openFolder', folderUri);
-            } catch (error) {
-                vscode.window.showErrorMessage(`Failed to open folder: ${error.message}`);
+    private async addToRecentlyOpened(uri: vscode.Uri, name?: string): Promise<void> {
+        if (name === undefined) {
+            name = path.basename(uri.fsPath);
+        }
+        const recents = this.getRecentlyOpened();
+        if (recents.findIndex(folder => folder.fsPath === uri.fsPath) === -1) {
+            if (await this.pathExists(uri)) {
+                recents.push({ fsPath: uri.fsPath, name: name });
+                await this.updateRecentlyOpened(recents);
             }
         }
     }
 
-    public async pathExists(uri: vscode.Uri): Promise<boolean> {
+    private async updateRecentlyOpened(recents: IRecent[]): Promise<void> {
+        await this.context.globalState.update(GLOBAL_STATE_RECENT_KEY, recents);
+    }
+
+    private async pathExists(uri: vscode.Uri): Promise<boolean> {
         try {
             const stat = await vscode.workspace.fs.stat(uri);
             return (stat.type === vscode.FileType.Directory) || (stat.type === vscode.FileType.File);
@@ -99,7 +85,7 @@ export default class RecentService extends BaseService {
         }
     }
 
-    public GetFilesExternalToTheWorkspace(): vscode.Uri[] {
+    private GetFilesExternalToTheWorkspace(): vscode.Uri[] {
         const externalFiles: vscode.Uri[] = [];
         const tabs = vscode.window.tabGroups.all.map(tab => tab.tabs).flat();
 

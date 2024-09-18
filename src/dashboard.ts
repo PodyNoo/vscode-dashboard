@@ -300,7 +300,7 @@ export function activate(context: vscode.ExtensionContext) {
                         await emptyRecentGroup();
                         break;
                     case 'open-folder':
-                        await recentService.openFolder();
+                        await fileService.openFolder();
                         break;
                     case 'new-text-file':
                         await fileService.newTextFile();
@@ -450,7 +450,7 @@ export function activate(context: vscode.ExtensionContext) {
     }
 
     async function emptyRecentGroup() {
-        await recentService.updateRecentlyOpened([]);
+        await recentService.resetRecentlyOpened();
 
         let accepted = await vscode.window.showWarningMessage(`Empty all recents folders ?`, { modal: true }, 'Empty');
         if (!accepted) {
