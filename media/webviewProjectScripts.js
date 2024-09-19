@@ -297,6 +297,14 @@ function initProjects() {
         }
     });
 
+    document.addEventListener('scroll', (e) => {
+        window.vscode.postMessage({
+            type: 'scroll-position',
+            X: window.scrollX,
+            Y: window.scrollY
+        });
+    });
+
     document.addEventListener('mousedown', (e) => {
         if (e.button === 1) {
             onMouseEvent(e);

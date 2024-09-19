@@ -103,3 +103,8 @@ export enum ReopenDashboardReason {
     None = 0,
     EditorReopenedAsWorkspace,
 }
+
+export interface IScrollPosition {
+    X: number,
+    Y: number
+}

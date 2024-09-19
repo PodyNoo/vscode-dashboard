@@ -1,7 +1,7 @@
 'use strict';
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { Project, GroupOrder, Group, ProjectRemoteType, getRemoteType, DashboardInfos, ProjectOpenType, ReopenDashboardReason, ProjectPathType, sanitizeProjectName } from './models';
+import { Project, GroupOrder, Group, ProjectRemoteType, getRemoteType, DashboardInfos, ProjectOpenType, ReopenDashboardReason, ProjectPathType, sanitizeProjectName, IScrollPosition } from './models';
 import { getSidebarContent, getDashboardContent } from './webview/webviewContent';
 import { USE_PROJECT_COLOR, PREDEFINED_COLORS, StartupOptions, USER_CANCELED, FixedColorOptions, RelevantExtensions, SSH_REGEX, REMOTE_REGEX, SSH_REMOTE_PREFIX, REOPEN_KEY, WSL_DEFAULT_REGEX } from './constants';
 import { execSync } from 'child_process';
@@ -186,6 +186,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
     }
 
+    var scrollPosition: IScrollPosition;
     var recentGroup: Group;
 
     function showDashboard(reveal: boolean = true) {
@@ -198,7 +199,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
 
         if (instance) {
-            instance.webview.html = getDashboardContent(context, instance.webview, projects, dashboardInfos, recentGroup);
+            instance.webview.html = getDashboardContent(context, instance.webview, projects, dashboardInfos, recentGroup, scrollPosition);
             if (reveal) {
                 instance.reveal(columnToShowIn);
             }
@@ -314,6 +315,12 @@ export function activate(context: vscode.ExtensionContext) {
                         break;
                     case 'reload-dashboard':
                         showDashboard();
+                        break;
+                    case 'scroll-position':
+                        scrollPosition = {
+                            X: e.X,
+                            Y: e.Y
+                        };
                         break;
                 }
             });

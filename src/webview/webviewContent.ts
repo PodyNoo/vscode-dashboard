@@ -4,6 +4,7 @@ import * as path from 'path';
 import {
     Project,
     Group,
+    IScrollPosition,
     getRemoteType,
     ProjectRemoteType,
     DashboardInfos,
@@ -38,7 +39,8 @@ export function getDashboardContent(
     webview: vscode.Webview,
     groups: Group[],
     infos: DashboardInfos,
-    recentGroup?: Group
+    recentGroup?: Group,
+    scrollPosition?: IScrollPosition
 ): string {
     var stylesPath = getMediaResource(context, webview, 'styles.css');
     var fittyPath = getMediaResource(context, webview, 'fitty.min.js');
@@ -139,6 +141,9 @@ export function getDashboardContent(
                 initProjects();
                 initDnD();
                 initFiltering(${infos.config.searchIsActiveByDefault});
+                ${scrollPosition ? `
+                    requestAnimationFrame(() => { window.scrollTo(${scrollPosition.X}, ${scrollPosition.Y}); });
+                ` : ""}
             }
         })();
     </script>
