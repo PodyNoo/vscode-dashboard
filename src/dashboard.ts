@@ -320,6 +320,11 @@ export function activate(context: vscode.ExtensionContext) {
             panel.onDidDispose(() => {
                 instance = null;
             });
+            panel.onDidChangeViewState((e) => {
+                if (panel.active) {
+                    showDashboard(false);
+                }
+            });
 
             instance = panel;
         }
