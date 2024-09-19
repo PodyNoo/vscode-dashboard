@@ -13,5 +13,9 @@
 	"containerEnv": {
 		"WATCHPACK_POLLING": "1000"
 	},
-	"postCreateCommand": "npm install -g @vscode/vsce"
+	"postCreateCommand": "sudo chown node node_modules && npm install -g @vscode/vsce",
+	"remoteUser": "node",
+	"mounts": [
+		"source=${localWorkspaceFolderBasename}_node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
+	]
 }
