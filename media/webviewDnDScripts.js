@@ -9,6 +9,9 @@ function initDnD() {
         moves: function (el, source, handle, sibling) {
             return !el.hasAttribute("data-nodrag");
         },
+        accepts: function (el, target, source, sibling) {
+            return !target.parentNode.hasAttribute("is-recent-group");
+        },
     });
     projectDrake.on('drop', onReordered);
     projectDrake.on('drag', () => document.body.classList.add('project-dragging'));
@@ -17,7 +20,7 @@ function initDnD() {
     var groupsContainers = document.querySelectorAll(groupsContainerSelector);
     var groupsDrake = dragula([].slice.call(groupsContainers), {
         moves: function (el, source, handle, sibling) {
-            return handle.hasAttribute("data-drag-group");
+            return handle.hasAttribute("data-drag-group") && !el.hasAttribute("is-recent-group");
         },
     });
     groupsDrake.on('drop', onReordered);
@@ -38,7 +41,7 @@ function initDnD() {
 
     function onReordered() {
         // Build reordering object
-        let groupElements = [...document.querySelectorAll(`${groupsContainerSelector} > [data-group-id]`)];
+        let groupElements = [...document.querySelectorAll(`${groupsContainerSelector} > [data-group-id]:not([is-recent-group])`)];
         // If a project was dropped on the Create New Group element...
         let tempGroupElement = document.querySelector('#tempGroup');
         if (tempGroupElement && tempGroupElement.querySelector("[data-id]")) {

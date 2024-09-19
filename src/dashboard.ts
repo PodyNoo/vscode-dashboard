@@ -258,7 +258,7 @@ export function activate(context: vscode.ExtensionContext) {
                         recentProject = recentGroup.projects.find(project => project.id === projectId);
                         await addRecentProject(recentProject);
                         break;
-                case 'import-from-other-storage':
+                    case 'import-from-other-storage':
                         await projectService.copyProjectsFromFilledStorageOptionToEmptyStorageOption();
                         await showDashboard();
                         break;
@@ -1170,6 +1170,10 @@ export function activate(context: vscode.ExtensionContext) {
     async function reorderGroups(groupOrders: GroupOrder[]) {
         var groups = projectService.getGroups();
 
+        if (dashboardInfos.config.showRecentGroup) {
+            groups.push(recentGroup);
+        }
+
         if (groupOrders == null) {
             vscode.window.showInformationMessage('Invalid Argument passed to Reordering Projects.');
             return;
@@ -1197,6 +1201,7 @@ export function activate(context: vscode.ExtensionContext) {
             }
 
             group.projects = projectIds.map(pid => projectMap.get(pid)).filter(p => p != null);
+
             reorderedGroups.push(group);
         }
 

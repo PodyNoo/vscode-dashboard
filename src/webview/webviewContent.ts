@@ -164,7 +164,7 @@ function getGroupSection(
 
     return `
 <div class="group ${group.collapsed ? 'collapsed' : ''} ${group.projects.length === 0 ? 'no-projects' : ''
-        }" data-group-id="${group.id}">
+        }" data-group-id="${group.id}" ${isRecentGroup ? "is-recent-group" : "" }>
     <div class="group-title">
         <span class="group-title-text" data-action="collapse" data-drag-group>
             <span class="collapse-icon" title="Open/Collapse Group">${Icons.collapse
@@ -257,8 +257,8 @@ function getProjectDiv(project: Project, infos: DashboardInfos, isRecentGroup = 
 
 function getNoProjectsDiv() {
     return `
-<div class="project-container">
-    <div class="project no-projects" data-action="add-project" data-nodrag>
+<div class="project-container" data-nodrag>
+    <div class="project no-projects" data-action="add-project">
         No projects have been added yet.
         <br/>
         Click here to add one.
@@ -268,8 +268,8 @@ function getNoProjectsDiv() {
 
 function getImportDiv() {
     return `
-<div class="project-container">
-    <div class="project no-projects import-data" data-action="import-from-other-storage" data-nodrag>
+<div class="project-container" data-nodrag>
+    <div class="project no-projects import-data" data-action="import-from-other-storage">
         Your dashboard is empty, but there are projects in your other storage. 
         <br/>
         This can happen if the storage option has been changed on a different device that is synced via Settings Sync.
