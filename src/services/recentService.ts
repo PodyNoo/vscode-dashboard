@@ -7,17 +7,23 @@ import { Project } from '../models';
 import * as path from 'path';
 import { EventEmitter } from 'events';
 
-export interface IRecent {
+interface IRecent {
 	fsPath: string;
 	name: string;
 }
 
-const GLOBAL_STATE_RECENT_KEY = 'recentList';
+interface IRecentState {
+    hash?: number;
+    recents: IRecent[];
+}
+
+const GLOBAL_STATE_RECENT_KEY = 'recentState';
 const RECENTLY_CHANGED_EMIT = 'recentListChanged';
 const DEBOUNCE_MS = 300;
 
 export default class RecentService extends BaseService {
     private _recentlyChangedEmitter: EventEmitter;
+    private _lastStateHash: number;
 
     constructor(context: vscode.ExtensionContext) {
         super(context);
@@ -27,7 +33,7 @@ export default class RecentService extends BaseService {
     }
 
     public getRecentlyOpened(): IRecent[] {
-        return this.context.globalState.get<IRecent[]>(GLOBAL_STATE_RECENT_KEY, []);
+        return this.getRecentState().recents;
     }
 
     public async refreshRecentlyOpened(onlyFiles: boolean = false) {
@@ -75,6 +81,12 @@ export default class RecentService extends BaseService {
         };
     }
 
+    private getRecentState(): IRecentState {
+        const recentState = this.context.globalState.get<IRecentState>(GLOBAL_STATE_RECENT_KEY, { recents: [] });
+        this._lastStateHash = recentState.hash;
+        return recentState;
+    }
+
     private async addToRecentlyOpened(uri: vscode.Uri, name?: string): Promise<void> {
         let recentlyOpenedHasChanged = false;
         if (name === undefined) {
@@ -94,7 +106,28 @@ export default class RecentService extends BaseService {
     }
 
     private async updateRecentlyOpened(recents: IRecent[]): Promise<void> {
-        await this.context.globalState.update(GLOBAL_STATE_RECENT_KEY, recents);
+        const recentState: IRecentState = { hash: this.calculateRecentsHash(recents), recents: recents };
+        await this.context.globalState.update(GLOBAL_STATE_RECENT_KEY, recentState);
+    }
+
+    private calculateRecentsHash(recents: IRecent[]): number {
+        if (!recents && recents.length < 1) {
+            return null;
+        }
+        let hash = this.hash(recents[0].fsPath + 0);
+        for (let i  = 1; i < recents.length; i++) {
+            hash = hash ^ this.hash(recents[i].fsPath + i);
+        }
+        return hash;
+    }
+
+    private hash(str: string): number {
+        // djb2
+        let hash = 5381;
+        for (let i = 0; i < str.length; i++) {
+            hash = ((hash << 5) + hash) + str.charCodeAt(i); // hash * 33 + c
+        }
+        return hash >>> 0;
     }
 
     private async pathExists(uri: vscode.Uri): Promise<boolean> {
@@ -156,5 +189,15 @@ export default class RecentService extends BaseService {
                 refreshRecentlyOpenedFilesTimeoutId = null;
             }
         }));
+
+        // Check if recentState has been modified by another instance
+        const watchForChangesId = setInterval(() => {
+            if (this._lastStateHash !== this.getRecentState().hash) {
+                this._recentlyChangedEmitter.emit(RECENTLY_CHANGED_EMIT);
+            }
+        }, 1000);
+        this.context.subscriptions.push({ dispose: () => {
+            clearInterval(watchForChangesId);
+        }});
     }
 }
