@@ -12,5 +12,6 @@
 	},
 	"containerEnv": {
 		"WATCHPACK_POLLING": "1000"
-	}
+	},
+	"postCreateCommand": "npm install -g @vscode/vsce"
 }
