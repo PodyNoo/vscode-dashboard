@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as fs from 'fs';
 
 import {
     Project,
@@ -121,6 +122,7 @@ export function getDashboardContent(
         </div>
 
         ${getProjectContextMenu()}
+        ${getProjectContextMenu(true)}
         ${getGroupContextMenu()}
     </body>
 
@@ -211,19 +213,27 @@ function getProjectDiv(project: Project, infos: DashboardInfos, isRecentGroup = 
     var isRemote = remoteType !== ProjectRemoteType.None;
     var remoteExError = isRemote && !infos.relevantExtensionsInstalls.remoteSSH;
 
+    // REWORK: we should be able to check this within project object directly
+    let projectIsFile: boolean;
+    try {
+        projectIsFile = !fs.statSync(project.path).isDirectory() && !project.path.toLowerCase().endsWith(".code-workspace");
+    } catch {
+        projectIsFile = false;
+    }
+
     return `
 <div class="project-container">
-    <div class="project" data-id="${project.id}" data-name="${lowerName}" ${isRemote ? 'data-is-remote' : ''} ${isRecentGroup ? 'is-recent-project' : ''}>
+    <div class="project" data-id="${project.id}" data-name="${lowerName}" ${isRemote ? 'data-is-remote' : ''} ${isRecentGroup ? 'is-recent-project' : ''} ${projectIsFile ? "project-is-file" : ""}>
         <div class="project-border" style="${borderStyle}"></div>
         <div class="project-actions-wrapper">
             <div class="project-actions">
                 ${isRecentGroup ? `
-                    <span data-action="add-recent" title="Add Recent Project">${Icons.pin}</span>
-                    <span data-action="remove-recent" title="Remove Recent Project">${Icons.remove}</span>
+                    <span data-action="add-recent" title="Add Recent Project ${projectIsFile ? "(File)" : ""}">${Icons.pin}</span>
+                    <span data-action="remove-recent" title="Remove Recent Project ${projectIsFile ? "(File)" : ""}">${Icons.remove}</span>
                 ` : `
                     <span data-action="color" title="Edit Color">${Icons.palette}</span>
-                    <span data-action="edit" title="Edit Project">${Icons.edit}</span>
-                    <span data-action="remove" title="Remove Project">${Icons.remove}</span>
+                    <span data-action="edit" title="Edit Project ${projectIsFile ? "(File)" : ""}">${Icons.edit}</span>
+                    <span data-action="remove" title="Remove Project ${projectIsFile ? "(File)" : ""}">${Icons.remove}</span>
                 `}
             </div>
         </div>
@@ -289,35 +299,37 @@ function getAddProjectDiv(groupId: string) {
 </span>`;
 }
 
-function getProjectContextMenu() {
+function getProjectContextMenu(projectIsFile: boolean = false) {
     return `
-<div id="projectContextMenu" class="custom-context-menu">
+<div id="${projectIsFile ? "fileContextMenu" : "projectContextMenu"}" class="custom-context-menu">
     <div class="custom-context-menu-item" data-action="open">
-        Open Project
+        Open Project ${projectIsFile ? "(File)" : ""}
     </div>
-    <div class="custom-context-menu-item" data-action="open-new-window">
-        Open Project In New Window
-    </div>
-    <div class="custom-context-menu-item not-remote" data-action="open-add-to-workspace">
-        Add To Workspace
-    </div>
+    ${projectIsFile ? "" : `
+        <div class="custom-context-menu-item" data-action="open-new-window">
+            Open Project In New Window
+        </div>
+        <div class="custom-context-menu-item not-remote" data-action="open-add-to-workspace">
+            Add To Workspace
+        </div>
+    `}
 
     <div class="custom-context-menu-separator"></div>
     <div class="custom-context-menu-item not-recent" data-action="color">
         Edit Color
     </div>
     <div class="custom-context-menu-item not-recent" data-action="edit">
-        Edit Project
+        Edit Project ${projectIsFile ? "(File)" : ""}
     </div>
     <div class="custom-context-menu-item not-recent" data-action="remove">
-        Remove Project
+        Remove Project ${projectIsFile ? "(File)" : ""}
     </div>
     
     <div class="custom-context-menu-item recent" data-action="add-recent">
-        Add Recent Project
+        Add Recent Project ${projectIsFile ? "(File)" : ""}
     </div>
     <div class="custom-context-menu-item recent" data-action="remove-recent">
-        Remove Recent Project
+        Remove Recent Project ${projectIsFile ? "(File)" : ""}
     </div>
 </div>
 `;

@@ -129,7 +129,7 @@ function initProjects() {
                 return;
             }
 
-            contextMenuElement = document.getElementById("projectContextMenu");
+            contextMenuElement = projectDiv.hasAttribute("project-is-file") ? document.getElementById("fileContextMenu") : document.getElementById("projectContextMenu");
         } else {
             let groupIdDiv = groupDiv.closest(".group[data-group-id]");
             contextMenuGroupId = groupIdDiv ? groupIdDiv.getAttribute("data-group-id") : null;
