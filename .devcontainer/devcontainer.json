@@ -16,6 +16,7 @@
 	"postCreateCommand": "sudo chown node node_modules && npm install -g @vscode/vsce",
 	"remoteUser": "node",
 	"mounts": [
-		"source=${localWorkspaceFolderBasename}_node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
+		"source=${localWorkspaceFolderBasename}_node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume",
+		"source=${localEnv:HOME}/.ssh,target=/home/node/.ssh,readonly,type=bind"
 	]
 }
