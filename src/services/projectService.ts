@@ -39,13 +39,15 @@ export default class ProjectService extends BaseService {
         const recents = this.recentService.getRecentlyOpened();
         const recentProjects: Project[] = [];
         const hidePinned: boolean = this.configurationSection.get('hideProjectAlreadyInGroupFromRecent');
+        let allProjects: Project[];
+        if (hidePinned) {
+            allProjects = groups.map(group => group.projects).flat();
+        }
         recents.forEach(recent => {
             if (hidePinned) {
-                for (let group of groups) {
-                    for (let project of group.projects) {
-                        if (project.path === recent.fsPath) {
-                            return;
-                        }
+                for (let project of allProjects) {
+                    if (project.path === recent.fsPath) {
+                        return;
                     }
                 }
             }
