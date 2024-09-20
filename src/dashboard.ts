@@ -513,9 +513,20 @@ export function activate(context: vscode.ExtensionContext) {
                 if (projectOpenType === ProjectOpenType.AddToWorkspace) {
                     await addToWorkspace(project, uri);
                 } else {
-                    await vscode.commands.executeCommand("vscode.openFolder", uri, openInNewWindow);
+                    // REWORK: we should be able to check this within project object directly
+                    let projectIsFile: boolean;
+                    try {
+                        const stat = await vscode.workspace.fs.stat(uri);
+                        projectIsFile = stat.type === vscode.FileType.File && !project.path.toLowerCase().endsWith(".code-workspace");
+                    } catch {
+                        projectIsFile = false;
+                    }
+                    if (projectIsFile) {
+                        await vscode.commands.executeCommand("vscode.open", uri);
+                    } else {
+                        await vscode.commands.executeCommand("vscode.openFolder", uri, openInNewWindow);
+                    }
                 }
-
                 break;
             case ProjectRemoteType.SSH:
                 let remotePathMatch = projectPath.replace(SSH_REMOTE_PREFIX, '').match(SSH_REGEX);
