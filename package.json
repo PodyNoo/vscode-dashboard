@@ -208,9 +208,13 @@
         "watch-tests": "tsc -p . -w --outDir out",
         "pretest": "npm run compile-tests && npm run compile && npm run lint",
         "lint": "eslint src",
-        "test": "vscode-test"
+        "test": "vscode-test",
+        "changelog": "release-it --no-increment --no-git.tag --no-git.commit",
+        "version": "npm version --no-git-tag-version",
+        "release": "release-it"
     },
     "devDependencies": {
+        "@release-it/conventional-changelog": "^8.0.2",
         "@types/dragula": "^3.7.5",
         "@types/mocha": "^10.0.8",
         "@types/node": "^16.18.108",
@@ -224,6 +228,7 @@
         "gulp-clean-css": "^4.3.0",
         "gulp-mode": "^1.1.0",
         "gulp-sass": "^5.1.0",
+        "release-it": "^17.6.0",
         "sass": "^1.78.0",
         "ts-loader": "^9.5.1",
         "typescript": "^5.5.4",
