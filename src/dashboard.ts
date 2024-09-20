@@ -122,7 +122,8 @@ export function activate(context: vscode.ExtensionContext) {
             event.affectsConfiguration("dashboard.showAddProjectButtonTile") ||
             event.affectsConfiguration("dashboard.showAddGroupButtonTile") ||
             event.affectsConfiguration("dashboard.showRecentGroup") ||
-            event.affectsConfiguration("dashboard.customCss")
+            event.affectsConfiguration("dashboard.customCss") ||
+            event.affectsConfiguration("showRecentGroupTop")
         ) {
             showDashboard(false);
         }
@@ -195,7 +196,11 @@ export function activate(context: vscode.ExtensionContext) {
 
         if (dashboardInfos.config.showRecentGroup) {
             recentGroup = projectService.getRecent(projects);
-            projects.push(recentGroup);
+            if (dashboardInfos.config.showRecentGroupTop) {
+                projects.unshift(recentGroup);
+            } else {
+                projects.push(recentGroup);
+            }
         }
 
         if (instance) {
@@ -219,6 +224,10 @@ export function activate(context: vscode.ExtensionContext) {
                 },
             );
             panel.iconPath = vscode.Uri.file(path.join(context.extensionPath, 'media', 'icon.svg'));
+
+            if (dashboardInfos.config.recentGroupFolded) {
+                recentGroup.collapsed = true;
+            }
 
             panel.webview.html = getDashboardContent(context, panel.webview, projects, dashboardInfos, recentGroup);
 

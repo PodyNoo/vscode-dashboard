@@ -148,6 +148,16 @@
                     "markdownDescription": "If set to ```false```, the recent group, containing recently opened folders will be hidden.",
                     "default": true
                 },
+                "dashboard.showRecentGroupTop": {
+                    "type": "boolean",
+                    "markdownDescription": "If set to ```true```, the recent group, containing recently opened folders will be ordered as the first group.",
+                    "default": false
+                },
+                "dashboard.recentGroupFolded": {
+                    "type": "boolean",
+                    "markdownDescription": "If set to ```true```, the recent group will always be folded when openning the dashboard.",
+                    "default": false
+                },
                 "dashboard.hideProjectAlreadyInGroupFromRecent": {
                     "type": "boolean",
                     "markdownDescription": "If set to ```false```, will show projects in recent group even if they are already in a group.",
