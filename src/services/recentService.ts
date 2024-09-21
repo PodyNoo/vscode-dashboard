@@ -95,7 +95,7 @@ export default class RecentService extends BaseService {
         const recents = this.getRecentlyOpened();
         if (recents.findIndex(folder => folder.fsPath === uri.fsPath) === -1) {
             if (await this.pathExists(uri)) {
-                recents.push({ fsPath: uri.fsPath, name: name });
+                recents.unshift({ fsPath: uri.fsPath, name: name });
                 await this.updateRecentlyOpened(recents);
                 recentlyOpenedHasChanged = true;
             }
