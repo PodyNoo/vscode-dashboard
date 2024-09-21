@@ -2,6 +2,25 @@
 
 All notable changes to the "Project Dashboard" extension will be documented in this file. It follows the [Keep a Changelog](http://keepachangelog.com/) recommendations.
 
+## [[2.8.0](https://github.com/podynoo/vscode-dashboard-enhanced/compare/2.7.1...2.8.0)] 2024-09-21
+
+### Added
+
+* Added files recently opened in recent group. ([047ba1b](https://github.com/podynoo/vscode-dashboard-enhanced/commit/047ba1b23f1025720ea2f45c6f466bc12b230564))
+* Added setting to show recent group at the top of the dashboard (dashboard.showRecentGroupTop) and another setting to have it always folded (dashboard.recentGroupFolded). ([f154d56](https://github.com/podynoo/vscode-dashboard-enhanced/commit/f154d562f20f00a657b1216e65e652f5dd35ea48))
+* Button to open folder in dashboard can now also open files or workspace files when holding SHIFT or CTRL. ([f02a0df](https://github.com/podynoo/vscode-dashboard-enhanced/commit/f02a0dfe70dafbcc1b1ca2ccfc9fa121d1367027))
+
+### Changed
+
+* Better dashboard reload when state changed. ([2fb303d](https://github.com/podynoo/vscode-dashboard-enhanced/commit/2fb303d2ef37ec17287be646da25f07305cff015) & [8c723af](https://github.com/podynoo/vscode-dashboard-enhanced/commit/8c723af1613a1da9643769a29f99d2c80f84acda) & [a4749a6](https://github.com/podynoo/vscode-dashboard-enhanced/commit/a4749a6e1777553990139c27f3499ecead3745b5))
+* Updated dependencies and project aligned with last VSCode extension template. ([1054763](https://github.com/podynoo/vscode-dashboard-enhanced/commit/1054763efb91b55381f085ce4056ee704275849c))
+
+### Fixed
+
+* Dragging system behavior with recent group (can't drag projects to it, but can drag recent projects and file to other groups). ([f382e73](https://github.com/podynoo/vscode-dashboard-enhanced/commit/f382e7357e97014f8ff46c1533f8822ac3db0e94))
+* Project Dashboard will not open anymore on config changes. ([49f0d25](https://github.com/podynoo/vscode-dashboard-enhanced/commit/49f0d251efe1da610731b3f15c3261bde5a1555b))
+* Scrolling back to where the scroll position was after an automatic reload of Project Dashboard. ([944a2bf](https://github.com/podynoo/vscode-dashboard-enhanced/commit/944a2bfaaffca745f3adfe4e5b8d7abc178f9d2f))
+
 ## [[2.7.1](https://github.com/podynoo/vscode-dashboard-enhanced/compare/2.7.0...2.7.1)] 2024-09-16
 
 ### Fixed
