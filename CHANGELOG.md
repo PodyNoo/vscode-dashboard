@@ -2,6 +2,13 @@
 
 All notable changes to the "Project Dashboard" extension will be documented in this file. It follows the [Keep a Changelog](http://keepachangelog.com/) recommendations.
 
+## [[2.8.1](https://github.com/podynoo/vscode-dashboard-enhanced/compare/2.8.0...2.8.1)] 2024-09-21
+
+
+### Fixed
+
+* Add more recent opened projects to beginning of the recent group instead of the end. ([6e15adf](https://github.com/podynoo/vscode-dashboard-enhanced/commit/6e15adf0fe470fb39428906ceef623cb54a075be))
+
 ## [[2.8.0](https://github.com/podynoo/vscode-dashboard-enhanced/compare/2.7.1...2.8.0)] 2024-09-21
 
 ### Added
