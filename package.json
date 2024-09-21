@@ -3,7 +3,7 @@
     "displayName": "Project Dashboard Enhanced",
     "description": "Organize your workspaces in a speed-dial manner.",
     "version": "2.8.0",
-    "publisher": "podynoo",
+    "publisher": "PodyNoo",
     "author": {
         "name": "kruemelkatze",
         "url": "https://github.com/Kruemelkatze/vscode-dashboard"
@@ -209,7 +209,7 @@
         "pretest": "npm run compile-tests && npm run compile && npm run lint",
         "lint": "eslint src",
         "test": "vscode-test",
-        "changelog": "release-it --no-increment --no-git.tag --no-git.commit",
+        "changelog": "release-it --no-increment --no-git.tag --no-git.commit --plugins.@release-it/conventional-changelog.infile=",
         "version": "npm version --no-git-tag-version",
         "release": "release-it"
     },
