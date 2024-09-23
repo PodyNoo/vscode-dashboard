@@ -111,7 +111,7 @@ export default class RecentService extends BaseService {
     }
 
     private calculateRecentsHash(recents: IRecent[]): number {
-        if (!recents && recents.length < 1) {
+        if (!recents || recents.length < 1) {
             return null;
         }
         let hash = this.hash(recents[0].fsPath + 0);
